@@ -28,9 +28,13 @@ public class PlayerInventory : MonoBehaviour
         currentObject = holdObject;
     }
 
-    public void DeactivateHoldingObject()
+    public void DropHoldingObject(Pickable pickedObject)
     {
-        currentObject.SetActive(false);
+        if (currentObject != null)
+        {
+            currentObject.SetActive(false);
+            currentObject = null;
+        }
     }
 
 }
