@@ -10,6 +10,10 @@ public class PlayerController : MonoBehaviour
     public float groundAcceleration = 45f;   // unidades/s² al acelerar
     public float groundDeceleration = 30f;   // unidades/s² al frenar (mayor = más grip)
 
+    [Header("Gravity")]
+    public float gravity = -20f;
+    public float groundedStickForce = -2f;   // mantiene isGrounded estable
+
     public Vector3 horizontalVelocity;
     public Vector3 playerVelocity;
 
@@ -53,7 +57,13 @@ public class PlayerController : MonoBehaviour
         // si vas a la derecha y pulsas izquierda, pasa por cero progresivamente
         horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, targetVelocity, rate * Time.deltaTime);
 
-        // mover de verdad
+        // Gravedad
+        if (characterController.isGrounded && playerVelocity.y < 0f)
+            playerVelocity.y = groundedStickForce;
+
+        playerVelocity.y += gravity * Time.deltaTime;
+
+        // mover de verdad (una sola llamada a Move)
         Vector3 finalVelocity = horizontalVelocity + Vector3.up * playerVelocity.y;
         characterController.Move(finalVelocity * Time.deltaTime);
     }
