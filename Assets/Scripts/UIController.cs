@@ -1,16 +1,24 @@
 using UnityEngine;
+using TMPro;
 
 public class UIController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private TextMeshProUGUI pickUpText;
+
+
+
+    private void OnEnable()
     {
-        
+        GameEvents.interactableHovered += UpdatePickUpText;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDisable()
     {
-        
+        GameEvents.interactableHovered -= UpdatePickUpText;
+    }
+
+    private void UpdatePickUpText(string pickUpText)
+    {
+        this.pickUpText.text = pickUpText;
     }
 }
