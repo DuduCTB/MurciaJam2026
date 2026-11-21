@@ -5,6 +5,9 @@ public class GameContext : MonoBehaviour
 
     public static GameContext instance;
 
+    public PlayerController player;
+    public PlayerInventory inventory;
+
     [Header("MainSettings")]
 
     public float mouseSensibility = 0.5f;
@@ -15,11 +18,12 @@ public class GameContext : MonoBehaviour
         {
             instance = this;
         }
+
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+    
+   
+   
 }
