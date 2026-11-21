@@ -2,14 +2,13 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [SerializeField] private Pickable pickedObject;
+    public bool pickedGnome;
 
     [SerializeField] private GameObject holdMineral, holdGnome;
     [SerializeField] private GameObject currentObject;
 
     public void UpdatePlayerInventory(Pickable pickedObject)
     {
-        this.pickedObject = pickedObject;
 
         switch (pickedObject.objectID)
         {
@@ -18,6 +17,7 @@ public class PlayerInventory : MonoBehaviour
                 break;
             case 1:
                 ActivateHoldObject(holdGnome);
+                pickedGnome = true;
                 break;
         }
     }
@@ -28,12 +28,15 @@ public class PlayerInventory : MonoBehaviour
         currentObject = holdObject;
     }
 
-    public void DropHoldingObject(Pickable pickedObject)
+    public void DropHoldingObject()
     {
         if (currentObject != null)
         {
             currentObject.SetActive(false);
             currentObject = null;
+
+            holdMineral.SetActive(false);
+            holdGnome.SetActive(false);
         }
     }
 
