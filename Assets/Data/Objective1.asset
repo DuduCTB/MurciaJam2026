@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cde81f2c2ad1c34a9fdf0d8a6bb17a1, type: 3}
   m_Name: Objective1
   m_EditorClassIdentifier: 
-  objectiveDesc: Recoge el material en las afueras.
+  objectiveDesc: Recupera el mineral que te ha robado!

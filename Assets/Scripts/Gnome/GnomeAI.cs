@@ -6,7 +6,7 @@ public class GnomeAI : MonoBehaviour
 
     [Header("References")]
 
-    private NavMeshAgent gnomeAgent;
+    public NavMeshAgent gnomeAgent;
 
     private void Awake()
     {
@@ -18,4 +18,17 @@ public class GnomeAI : MonoBehaviour
     {
         gnomeAgent.SetDestination(newPosition.position);
     }
+
+    public void TeleportGnome(Transform newPosition)
+    {
+        gnomeAgent.enabled = false;
+        transform.position = newPosition.position;
+        gnomeAgent.enabled = true;
+    }
+
+    public void ClearDestination()
+    {
+        gnomeAgent.ResetPath();
+    }
+
 }
