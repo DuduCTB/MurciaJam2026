@@ -8,7 +8,7 @@ public class Interactable : MonoBehaviour, IInteractable
         get { return isBlocked ? UIBlockedText : interactableNameText; }
     }
 
-    [SerializeField] private TriggerAction targetAction;
+    public TriggerAction targetAction;
 
     [SerializeField] private string interactableNameText = "Switch";
     [SerializeField] private string UIBlockedText = "Bloqueado";

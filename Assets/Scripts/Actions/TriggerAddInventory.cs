@@ -27,7 +27,7 @@ public class TriggerAddInventory : TriggerAction
     private void AddItemToInventory(Pickable item)
     {
         GameContext.instance.inventory.UpdatePlayerInventory(item);
-
+        RunAwayDirector.instance.GoNextStateAndExecute();
         Destroy(gameObject);
     }
 }

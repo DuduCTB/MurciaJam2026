@@ -21,6 +21,8 @@ public class RunAwayDirector : MonoBehaviour
 
     [Header("References")]
 
+    [SerializeField] private Interactable lever;
+
     public static RunAwayDirector instance;
 
 
@@ -50,6 +52,7 @@ public class RunAwayDirector : MonoBehaviour
                 GameEvents.onObjectiveChanged?.Invoke(objectives[1].objectiveDesc);
                 gnomeAI.SetDestination(hidePoints[1].transform);
                 detectionAreas[1].gameObject.SetActive(true);
+                lever.gameObject.layer = 6;
 
                 break;
 
@@ -89,17 +92,20 @@ public class RunAwayDirector : MonoBehaviour
 
             case 5: // Este punto se ejecuta cuando el jugador se acerca lo suficiente al siguiente al gnomo en el hueco 2, mirando hacia la nave. //El juego ya le pide que desista y que vaya a dejar el mineral, pulsando la palanca antes. La palanca se resalta con shader
                 GameEvents.onObjectiveChanged?.Invoke(objectives[6].objectiveDesc);
+                lever.gameObject.layer = 6;
                 //La palanca debería brillar con shader
-                
+
                 break;
 
             case 6: // Este punto se ejecuta cuando la palanca es pulsada. Se abre la puerta y se crea un area de deteccion del jugador que pille justo cuando vaya a entrar
                 detectionAreas[6].gameObject.SetActive(true);
+                lever.gameObject.layer = 0;
                 break;
 
             case 7: // Se ejecuta cuando el jugador entra en área. La puerta se cierra de repente y el gnomo spawnea al lado de la palanca.
                 gnomeAI.ClearDestination();
                 gnomeAI.TeleportGnome(leverCampPoint.transform);
+                lever.targetAction.UndoAction();
                 detectionAreas[7].gameObject.SetActive(true);
                 break;
 
@@ -111,16 +117,19 @@ public class RunAwayDirector : MonoBehaviour
             case 9: // Se ejecuta cuando el jugador llega casi al Gnomo, el juego le pide que desista y vuelva a la palanca
                 //Gnomo se esconde
                 // Palanca brilla
+                lever.gameObject.layer = 6;
                 break;
 
             case 10: //Se ejecuta cuando el jugador pulsa la palanca, hace aparecer un área de deteccion frente a la puerta
                 detectionAreas[9].gameObject.SetActive(true);
+                lever.gameObject.layer = 0;
                 break;
 
 
             case 11: //Se ejecuta cuando el jugador entra en el área de la puerta, esta se cierra. 
                 gnomeAI.ClearDestination();
                 gnomeAI.TeleportGnome(leverCampPoint.transform);
+                lever.targetAction.UndoAction();
                 gnomeAI.ClearDestination();
                 detectionAreas[10].gameObject.SetActive(true);
                 break;
