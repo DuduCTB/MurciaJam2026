@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Playables;
 
 public class RunAwayDirector : MonoBehaviour
 {
@@ -28,8 +29,10 @@ public class RunAwayDirector : MonoBehaviour
     [SerializeField] private Interactable lever;
     [SerializeField] private Interactable mineral;
 
-    public static RunAwayDirector instance;
+    [SerializeField] private PlayableDirector director;
+    [SerializeField] private GameObject player;
 
+    public static RunAwayDirector instance;
     private Coroutine randomChaseRoutine;
 
 
@@ -61,6 +64,7 @@ public class RunAwayDirector : MonoBehaviour
                 detectionAreas[1].gameObject.SetActive(true);
                 lever.gameObject.layer = 0;
                 mineral.gameObject.layer = 0;
+                GameContext.instance.player.AddRage(0.3f);
 
                 break;
 
@@ -82,11 +86,13 @@ public class RunAwayDirector : MonoBehaviour
             case 2: // Este punto se ejecuta cuando el jugador pilla el mineral. La UI le pide que busque el siguiente trozo.
                 GameEvents.onObjectiveChanged?.Invoke(objectives[4].objectiveDesc);
                 detectionAreas[3].gameObject.SetActive(true);
+                GameContext.instance.player.AddRage(0);
                 break;
 
             case 3: // Este punto se ejecuta cuando el jugador se acerca lo suficiente al siguiente trozo, el nomo lo pilla y el juego le pide que lo persiga
                 gnomeAI.TeleportGnome(steelPoint2.transform);
                 gnomeAI.SetDestination(hidePoints[3].transform);
+                GameContext.instance.player.AddRage(0.5f);
                 //Cambiar objetivo a que le persiga
                 detectionAreas[4].gameObject.SetActive(true);
                 GameEvents.onObjectiveChanged?.Invoke(objectives[5].objectiveDesc);
@@ -97,11 +103,13 @@ public class RunAwayDirector : MonoBehaviour
                 gnomeAI.SetDestination(hidePoints[1].transform);
                 //Cambiar objetivo a que vuelva a la sala de mandos. Pulsa la palanca para abrir la puerta
                 detectionAreas[5].gameObject.SetActive(true);
+                GameContext.instance.player.AddRage(0.1f);
                 break;
 
             case 5: // Este punto se ejecuta cuando el jugador se acerca lo suficiente al siguiente al gnomo en el hueco 2, mirando hacia la nave. //El juego ya le pide que desista y que vaya a dejar el mineral, pulsando la palanca antes. La palanca se resalta con shader
                 GameEvents.onObjectiveChanged?.Invoke(objectives[6].objectiveDesc);
                 lever.gameObject.layer = 6;
+                GameContext.instance.player.AddRage(0f);
                 //La palanca debería brillar con shader
 
                 break;
@@ -120,6 +128,7 @@ public class RunAwayDirector : MonoBehaviour
 
             case 8: // Se ejecuta cuando el jugador está mirando hacia el gnomo, este sale corriendo al hueco de delante
                 detectionAreas[8].gameObject.SetActive(true);
+                GameContext.instance.player.AddRage(0.6f);
                 gnomeAI.SetDestination(hidePoints[0].transform);
                 break;
 
@@ -131,12 +140,14 @@ public class RunAwayDirector : MonoBehaviour
 
             case 10: //Se ejecuta cuando el jugador pulsa la palanca, hace aparecer un área de deteccion frente a la puerta
                 detectionAreas[9].gameObject.SetActive(true);
+
                 lever.gameObject.layer = 0;
                 break;
 
 
             case 11: //Se ejecuta cuando el jugador entra en el área de la puerta, esta se cierra. 
                 gnomeAI.ClearDestination();
+                GameContext.instance.player.AddRage(1f);
                 gnomeAI.TeleportGnome(leverCampPoint.transform);
                 lever.targetAction.UndoAction();
                 gnomeAI.ClearDestination();
@@ -227,4 +238,10 @@ public class RunAwayDirector : MonoBehaviour
         return (gnomePos - targetPos).sqrMagnitude <= arrivalDistance * arrivalDistance;
     }
 
+
+    public void StartCinematic()
+    {
+        player.SetActive(false);
+        director.Play();
+    }
 }

@@ -7,6 +7,7 @@ public class GameContext : MonoBehaviour
 
     public PlayerController player;
     public PlayerInventory inventory;
+    public RageUI rageUI;
 
     [Header("MainSettings")]
 

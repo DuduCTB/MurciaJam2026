@@ -43,6 +43,7 @@ public class TriggerPlaceObjects : TriggerAction
         gnome.SetActive(true);
         mineral.SetActive(true);
         GameContext.instance.inventory.DropHoldingObject();
+        RunAwayDirector.instance.StartCinematic();
     }
 
     private void ChangeObjectName(string name)
