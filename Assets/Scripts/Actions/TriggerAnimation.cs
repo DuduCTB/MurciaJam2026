@@ -14,6 +14,7 @@ public class TriggerAnimation : TriggerAction
     public override bool ExecuteAction(bool instataneus = false, Action onActionFinished = null)
     {
         anim.SetBool(animParameter, true);
+        RunAwayDirector.instance.GoNextStateAndExecute();
         return true;
     }
 

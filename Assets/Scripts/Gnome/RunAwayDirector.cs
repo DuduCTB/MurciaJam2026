@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public class RunAwayDirector : MonoBehaviour
@@ -17,11 +18,19 @@ public class RunAwayDirector : MonoBehaviour
     [SerializeField] private WayPoint leverCampPoint;
     [SerializeField] private WayPoint steelPoint2;
 
-    [SerializeField] private GnomeAI gnomeAI;
+    public GnomeAI gnomeAI;
+
+    [SerializeField] private float arrivalDistance = 1.5f;   // Debe ser >= al Stopping Distance del NavMeshAgent
+    [SerializeField] private float waitAtPoint = 0f;
 
     [Header("References")]
 
+    [SerializeField] private Interactable lever;
+    [SerializeField] private Interactable mineral;
+
     public static RunAwayDirector instance;
+
+    private Coroutine randomChaseRoutine;
 
 
     private void Awake()
@@ -50,6 +59,8 @@ public class RunAwayDirector : MonoBehaviour
                 GameEvents.onObjectiveChanged?.Invoke(objectives[1].objectiveDesc);
                 gnomeAI.SetDestination(hidePoints[1].transform);
                 detectionAreas[1].gameObject.SetActive(true);
+                lever.gameObject.layer = 0;
+                mineral.gameObject.layer = 0;
 
                 break;
 
@@ -63,6 +74,7 @@ public class RunAwayDirector : MonoBehaviour
 
             case 1: // Este punto se ejecuta cuando el jugador llega a cierta distancia del hueco 3. El Gnomo se esconde dentro del hueco y la UI te pide que desistas y recojas el mineral.
                 GameEvents.onObjectiveChanged?.Invoke(objectives[3].objectiveDesc);
+                mineral.gameObject.layer = 6;
                 // Gnomo se esconde y desactiva
                 //Mineral resaltado
                 break;
@@ -89,17 +101,20 @@ public class RunAwayDirector : MonoBehaviour
 
             case 5: // Este punto se ejecuta cuando el jugador se acerca lo suficiente al siguiente al gnomo en el hueco 2, mirando hacia la nave. //El juego ya le pide que desista y que vaya a dejar el mineral, pulsando la palanca antes. La palanca se resalta con shader
                 GameEvents.onObjectiveChanged?.Invoke(objectives[6].objectiveDesc);
+                lever.gameObject.layer = 6;
                 //La palanca debería brillar con shader
-                
+
                 break;
 
             case 6: // Este punto se ejecuta cuando la palanca es pulsada. Se abre la puerta y se crea un area de deteccion del jugador que pille justo cuando vaya a entrar
                 detectionAreas[6].gameObject.SetActive(true);
+                lever.gameObject.layer = 0;
                 break;
 
             case 7: // Se ejecuta cuando el jugador entra en área. La puerta se cierra de repente y el gnomo spawnea al lado de la palanca.
                 gnomeAI.ClearDestination();
                 gnomeAI.TeleportGnome(leverCampPoint.transform);
+                lever.targetAction.UndoAction();
                 detectionAreas[7].gameObject.SetActive(true);
                 break;
 
@@ -111,29 +126,35 @@ public class RunAwayDirector : MonoBehaviour
             case 9: // Se ejecuta cuando el jugador llega casi al Gnomo, el juego le pide que desista y vuelva a la palanca
                 //Gnomo se esconde
                 // Palanca brilla
+                lever.gameObject.layer = 6;
                 break;
 
             case 10: //Se ejecuta cuando el jugador pulsa la palanca, hace aparecer un área de deteccion frente a la puerta
                 detectionAreas[9].gameObject.SetActive(true);
+                lever.gameObject.layer = 0;
                 break;
 
 
             case 11: //Se ejecuta cuando el jugador entra en el área de la puerta, esta se cierra. 
                 gnomeAI.ClearDestination();
                 gnomeAI.TeleportGnome(leverCampPoint.transform);
+                lever.targetAction.UndoAction();
                 gnomeAI.ClearDestination();
                 detectionAreas[10].gameObject.SetActive(true);
                 break;
 
             case 12:
-                gnomeAI.SetDestination(hidePoints[0].transform); // TEMPORAL
+                StartRandomChase();
+                gnomeAI.pickGnome.gameObject.SetActive(true);
+                GameEvents.onObjectiveChanged?.Invoke(objectives[7].objectiveDesc);
                 // Se ejecuta cuando el jugador está mirando hacia el gnomo, este sale corriendo y empieza la persecución aleatoria final. La UI te pide que vayas por el de una vez por todas, la rabia al máximo y
                 //la UI también lo sugiere. El eneano empieza a ir de hueco a hueco corriendo de formaleatoria hasta que lo pilles
 
                 break;
 
             case 13: //Alcanzas al enano y la UI te puide que vayas a la sala de mandos y lo mandes a bolar con el cohete resaltado.
-
+                lever.gameObject.layer = 6;
+                GameEvents.onObjectiveChanged?.Invoke(objectives[8].objectiveDesc);
                 break;
 
         }
@@ -143,6 +164,67 @@ public class RunAwayDirector : MonoBehaviour
     {
         ExecuteCurrentEvent();
         storyState++;
-    } 
-   
+    }
+
+
+    public void StartRandomChase()
+    {
+        StopRandomChase();
+        randomChaseRoutine = StartCoroutine(RandomChaseRoutine());
+    }
+
+    public void StopRandomChase()
+    {
+        if (randomChaseRoutine == null) return;
+
+        StopCoroutine(randomChaseRoutine);
+        randomChaseRoutine = null;
+    }
+
+    private IEnumerator RandomChaseRoutine()
+    {
+        if (hidePoints.Count == 0) yield break;
+
+        WayPoint current = null;
+
+        while (true)
+        {
+            WayPoint next = GetRandomHidePoint(current);
+            current = next;
+
+            gnomeAI.SetDestination(next.transform);
+
+            yield return new WaitUntil(() => HasArrived(next.transform));
+
+            if (waitAtPoint > 0f)
+            {
+                yield return new WaitForSeconds(waitAtPoint);
+            }
+        }
+    }
+
+    private WayPoint GetRandomHidePoint(WayPoint exclude)
+    {
+        if (hidePoints.Count == 1) return hidePoints[0];
+
+        WayPoint candidate;
+        do
+        {
+            candidate = hidePoints[UnityEngine.Random.Range(0, hidePoints.Count)];
+        }
+        while (candidate == exclude);
+
+        return candidate;
+    }
+
+    private bool HasArrived(Transform target)
+    {
+        Vector3 gnomePos = gnomeAI.transform.position;
+        Vector3 targetPos = target.position;
+        gnomePos.y = 0f;
+        targetPos.y = 0f; // Ignora la altura para que no falle si el punto está elevado
+
+        return (gnomePos - targetPos).sqrMagnitude <= arrivalDistance * arrivalDistance;
+    }
+
 }
