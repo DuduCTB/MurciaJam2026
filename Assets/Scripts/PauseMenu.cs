@@ -1,38 +1,38 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
-using UnityEngine.Audio;
 
 public class PauseMenu : MonoBehaviour
 {
     public GameObject pausePanel;
-    public MonoBehaviour[] disableOnPause;   // scripts de cámara y movimiento del Player
+    public GameObject pauseButtons;
+    public GameObject optionsPanel;
+    public MonoBehaviour[] disableOnPause;
     public string menuScene = "MainMenu";
-    public AudioMixer mixer;
 
     bool paused;
-    float musicBase, sfxBase, ambBase;
 
     void Start()
     {
         pausePanel.SetActive(false);
-        mixer.GetFloat("MusicVol", out musicBase);
-        mixer.GetFloat("SfxVol", out sfxBase);
-        mixer.GetFloat("AmbVol", out ambBase);
+        if (optionsPanel) optionsPanel.SetActive(false);
     }
 
     void Update()
     {
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            if (paused) Resume(); else Pause();
-        }
+        if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
+
+        if (!paused) Pause();
+        else if (optionsPanel && optionsPanel.activeSelf) CloseOptions();   // Esc en opciones = volver
+        else Resume();
     }
 
     public void Pause()
     {
         paused = true;
         pausePanel.SetActive(true);
+        if (pauseButtons) pauseButtons.SetActive(true);
+        if (optionsPanel) optionsPanel.SetActive(false);
         Time.timeScale = 0f;
         foreach (var m in disableOnPause) if (m) m.enabled = false;
         Cursor.lockState = CursorLockMode.None;
@@ -43,10 +43,23 @@ public class PauseMenu : MonoBehaviour
     {
         paused = false;
         pausePanel.SetActive(false);
+        if (optionsPanel) optionsPanel.SetActive(false);
         Time.timeScale = 1f;
         foreach (var m in disableOnPause) if (m) m.enabled = true;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public void OpenOptions()
+    {
+        pauseButtons.SetActive(false);
+        optionsPanel.SetActive(true);
+    }
+
+    public void CloseOptions()
+    {
+        optionsPanel.SetActive(false);
+        pauseButtons.SetActive(true);
     }
 
     public void GoToMenu()
@@ -58,14 +71,9 @@ public class PauseMenu : MonoBehaviour
     public void Quit()
     {
 #if UNITY_EDITOR
-    UnityEditor.EditorApplication.isPlaying = false;
+        UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif
     }
-
-    // Sliders: Min 0.0001, Max 1. Con 1 se queda el volumen que ya tenías en el mixer
-    public void SetMusic(float v) => mixer.SetFloat("MusicVol", musicBase + Mathf.Log10(v) * 20f);
-    public void SetSfx(float v) => mixer.SetFloat("SfxVol", sfxBase + Mathf.Log10(v) * 20f);
-    public void SetAmb(float v) => mixer.SetFloat("AmbVol", ambBase + Mathf.Log10(v) * 20f);
 }

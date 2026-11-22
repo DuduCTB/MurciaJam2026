@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
     public string gameScene = "Level1";
+    public SceneFader fader;
 
     void Start()
     {
@@ -12,7 +13,11 @@ public class MainMenu : MonoBehaviour
         Cursor.visible = true;
     }
 
-    public void Play() => SceneManager.LoadScene(gameScene);
+    public void Play()
+    {
+        if (fader) fader.FadeToScene(gameScene);
+        else SceneManager.LoadScene(gameScene);
+    }
 
     public void Quit()
     {
