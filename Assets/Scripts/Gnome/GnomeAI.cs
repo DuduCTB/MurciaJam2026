@@ -1,16 +1,34 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GnomeAI : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    [Header("References")]
+
+    public NavMeshAgent gnomeAgent;
+
+    private void Awake()
     {
-        
+        gnomeAgent = GetComponent<NavMeshAgent>();
     }
 
-    // Update is called once per frame
-    void Update()
+
+    public void SetDestination(Transform newPosition)
     {
-        
+        gnomeAgent.SetDestination(newPosition.position);
     }
+
+    public void TeleportGnome(Transform newPosition)
+    {
+        gnomeAgent.enabled = false;
+        transform.position = newPosition.position;
+        gnomeAgent.enabled = true;
+    }
+
+    public void ClearDestination()
+    {
+        gnomeAgent.ResetPath();
+    }
+
 }
