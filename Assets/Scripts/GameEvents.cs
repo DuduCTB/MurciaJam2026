@@ -9,4 +9,8 @@ public class GameEvents
     public static Action interactionSuccessful;
     public static Action<string> interactableHovered;
 
+    // UI
+
+    public static Action<string> onObjectiveChanged;
+
 }

@@ -11,6 +11,8 @@ public class RunAwayDirector : MonoBehaviour
     [Header("Needed references")]
 
     [SerializeField] private List<WayPoint> hidePoints = new List<WayPoint>();
+    [SerializeField] private List<ObjectiveData> objectives = new List<ObjectiveData>();
+    [SerializeField] private List<DetectionArea> detectionAreas = new List<DetectionArea>();
 
     [SerializeField] private WayPoint leverCampPoint;
 
@@ -36,6 +38,9 @@ public class RunAwayDirector : MonoBehaviour
         switch (storyState)
         {
             case 0: // el jugador alcanza el área que ejecuta que el Gnomo robe por primera vez el mineral, por lo que pasa el gnomo y lo roba. La UI le pide que vaya por él
+                GameEvents.onObjectiveChanged?.Invoke(objectives[0].objectiveDesc);
+                gnomeAI.SetDestination(hidePoints[1].transform);
+                detectionAreas[0].gameObject.SetActive(true);
 
                 break;
 
