@@ -38,13 +38,17 @@ public class RunAwayDirector : MonoBehaviour
         switch (storyState)
         {
             case 0: // el jugador alcanza el área que ejecuta que el Gnomo robe por primera vez el mineral, por lo que pasa el gnomo y lo roba. La UI le pide que vaya por él
-                GameEvents.onObjectiveChanged?.Invoke(objectives[0].objectiveDesc);
+                GameEvents.onObjectiveChanged?.Invoke(objectives[1].objectiveDesc);
                 gnomeAI.SetDestination(hidePoints[1].transform);
                 detectionAreas[0].gameObject.SetActive(true);
 
                 break;
 
             case 1: // Este punto se ejecuta cuando el jugador intenta pillar en el hueco (2) y se va justo. Por lo que sale corriendo hasta el hueco 3.
+                GameEvents.onObjectiveChanged?.Invoke(objectives[2].objectiveDesc); // Persiguelo!
+                gnomeAI.SetDestination(hidePoints[1].transform);
+                detectionAreas[0].gameObject.SetActive(true);
+
 
                 break;
 
