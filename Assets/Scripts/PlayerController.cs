@@ -5,6 +5,10 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Momentum Movement")]
 
+    [Header("Rage Multiplier")]
+
+    public float rageMultiplayer = 0.8f;
+
     [Header("Ground Movement")]
     public float groundMaxSpeed = 6f;
     public float groundAcceleration = 45f;   // unidades/s² al acelerar
@@ -42,7 +46,7 @@ public class PlayerController : MonoBehaviour
         if (characterController.enabled == false) return;
 
         Vector2 input = move.action.ReadValue<Vector2>();
-        float maxSpeed = groundMaxSpeed;
+        float maxSpeed = groundMaxSpeed * rageMultiplayer;
         float accel = groundAcceleration;
         float decel = groundDeceleration;
 
@@ -93,5 +97,12 @@ public class PlayerController : MonoBehaviour
         Vector2 input = move.action.ReadValue<Vector2>();
         input = Vector2.ClampMagnitude(input, 1f);
         return input;
+    }
+
+    public void AddRage(float amount)
+    {
+        rageMultiplayer += amount;
+        GameContext.instance.rageUI.SetRage(amount);
+
     }
 }

@@ -4,6 +4,7 @@ public class PlayerInventory : MonoBehaviour
 {
     public bool pickedGnome;
 
+
     [SerializeField] private GameObject holdMineral, holdGnome;
     [SerializeField] private GameObject currentObject;
 
