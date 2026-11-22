@@ -27,7 +27,7 @@ public class Interactor : MonoBehaviour
     private void OnDrawGizmos()
     {
         // Rayo que detecta si hay interactables frente al jugador
-        Debug.DrawLine(transform.position, transform.position + (transform.forward * interactRange), Color.blue, 0.01f);
+        ////Debug.DrawLine(transform.position, transform.position + (transform.forward * interactRange), Color.blue, 0.01f);
     }
 
     private void DetectIfInteractableInFrontOfPlayer()

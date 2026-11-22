@@ -8,6 +8,8 @@ public class GnomeAI : MonoBehaviour
 
     public NavMeshAgent gnomeAgent;
 
+    public Pickable pickGnome;
+
     private void Awake()
     {
         gnomeAgent = GetComponent<NavMeshAgent>();
